@@ -52,6 +52,7 @@ export type Database = {
           id: string
           occupancy_id: string
           paid_date: string | null
+          profile_id: string | null
           room_id: string
           room_rent: number
           status: string
@@ -70,6 +71,7 @@ export type Database = {
           id?: string
           occupancy_id: string
           paid_date?: string | null
+          profile_id?: string | null
           room_id: string
           room_rent?: number
           status?: string
@@ -88,6 +90,7 @@ export type Database = {
           id?: string
           occupancy_id?: string
           paid_date?: string | null
+          profile_id?: string | null
           room_id?: string
           room_rent?: number
           status?: string
@@ -103,6 +106,13 @@ export type Database = {
             columns: ["occupancy_id"]
             isOneToOne: false
             referencedRelation: "occupancy"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "billing_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
@@ -307,6 +317,7 @@ export type Database = {
           created_at: string
           id: string
           role: string
+          staff_id: string | null
           tenant_id: string | null
           updated_at: string
         }
@@ -314,6 +325,7 @@ export type Database = {
           created_at?: string
           id: string
           role?: string
+          staff_id?: string | null
           tenant_id?: string | null
           updated_at?: string
         }
@@ -321,6 +333,7 @@ export type Database = {
           created_at?: string
           id?: string
           role?: string
+          staff_id?: string | null
           tenant_id?: string | null
           updated_at?: string
         }
@@ -340,6 +353,7 @@ export type Database = {
           created_at: string | null
           description: string
           id: string
+          profile_id: string | null
           reported_date: string
           room_id: string
           room_number: string
@@ -351,6 +365,7 @@ export type Database = {
           created_at?: string | null
           description: string
           id?: string
+          profile_id?: string | null
           reported_date?: string
           room_id: string
           room_number: string
@@ -362,6 +377,7 @@ export type Database = {
           created_at?: string | null
           description?: string
           id?: string
+          profile_id?: string | null
           reported_date?: string
           room_id?: string
           room_number?: string
@@ -395,7 +411,7 @@ export type Database = {
           room_number: string
           room_type: string
           status: string
-          tenants: string | null
+          tenant_id: string | null
           updated_at: string | null
         }
         Insert: {
@@ -407,7 +423,7 @@ export type Database = {
           room_number: string
           room_type: string
           status?: string
-          tenants?: string | null
+          tenant_id?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -419,18 +435,60 @@ export type Database = {
           room_number?: string
           room_type?: string
           status?: string
-          tenants?: string | null
+          tenant_id?: string | null
           updated_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "rooms_tenants_fkey"
-            columns: ["tenants"]
+            foreignKeyName: "rooms_tenant_id_fkey"
+            columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
+      }
+      staff: {
+        Row: {
+          address: string | null
+          auth_email: string | null
+          created_at: string | null
+          email: string | null
+          emergency_contact: string | null
+          first_name: string
+          id: string
+          last_name: string
+          phone: string | null
+          room_number: string
+          updated_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          auth_email?: string | null
+          created_at?: string | null
+          email?: string | null
+          emergency_contact?: string | null
+          first_name: string
+          id?: string
+          last_name: string
+          phone?: string | null
+          room_number: string
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          auth_email?: string | null
+          created_at?: string | null
+          email?: string | null
+          emergency_contact?: string | null
+          first_name?: string
+          id?: string
+          last_name?: string
+          phone?: string | null
+          room_number?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       system_settings: {
         Row: {
@@ -505,15 +563,7 @@ export type Database = {
           room_number?: string
           updated_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "tenants_room_number_fkey"
-            columns: ["room_number"]
-            isOneToOne: false
-            referencedRelation: "rooms"
-            referencedColumns: ["room_number"]
-          },
-        ]
+        Relationships: []
       }
     }
     Views: {

@@ -1,7 +1,7 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/providers/AuthProvider";
 
 interface BillingRecord {
   id: string;
@@ -27,6 +27,7 @@ interface BillingRecord {
 
 export const useBillingPage = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [billings, setBillings] = useState<BillingRecord[]>([]);
@@ -35,12 +36,14 @@ export const useBillingPage = () => {
 
   useEffect(() => {
     fetchBillings();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]); // Refetch when user changes
 
   const fetchBillings = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
+
+      let query = supabase
         .from('billing')
         .select(`
           id,
@@ -64,6 +67,13 @@ export const useBillingPage = () => {
           )
         `)
         .order('created_at', { ascending: false });
+
+      // ถ้าเป็น tenant ดึงมาเฉพาะบิลของตัวเอง
+      if (user?.role === "tenant" && user?.tenant?.id) {
+        query = query.eq('tenant_id', user.tenant.id);
+      }
+
+      const { data, error } = await query;
 
       if (error) {
         console.error('Error fetching billings:', error);

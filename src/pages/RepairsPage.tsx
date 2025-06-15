@@ -146,11 +146,15 @@ export default function RepairsPage() {
       ? repair.status === statusFilter
       : true;
     
-    // For tenants, only show their own repairs
-    if (user?.role === "tenant") {
-      return matchesSearch && matchesStatus && repair.reportedBy === user.name;
+    // For tenants, only show repairs for their own room
+    if (user?.role === "tenant" && user?.tenant?.room_number) {
+      return (
+        matchesSearch &&
+        matchesStatus &&
+        repair.roomNumber === user.tenant.room_number
+      );
     }
-    
+    // สำหรับ admin/staff: เหมือนเดิม
     return matchesSearch && matchesStatus;
   });
 

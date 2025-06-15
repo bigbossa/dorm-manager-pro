@@ -143,6 +143,28 @@ const handler = async (req: Request): Promise<Response> => {
         }
       }
 
+      // >>> เพิ่มส่วนนี้สำหรับ staff <<<
+      // Create staff record if role is staff
+      if (role === 'staff') {
+        const { error: staffError } = await supabaseAdmin
+          .from('staff')
+          .insert({
+            first_name: firstName,
+            last_name: lastName,
+            email: email,
+            phone: phone,
+            auth_email: email,
+          });
+
+        if (staffError) {
+          console.error('Error creating staff:', staffError);
+          // Don't return error here, user is already created
+        } else {
+          console.log('Staff record created successfully');
+        }
+      }
+      // >>> จบส่วนที่เพิ่ม <<<
+
       // Update profile with role
       const { error: profileUpdateError } = await supabaseAdmin
         .from('profiles')

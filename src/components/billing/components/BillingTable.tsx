@@ -1,4 +1,3 @@
-
 import { 
   Table, 
   TableBody, 
@@ -44,13 +43,15 @@ interface BillingTableProps {
   filteredBillings: BillingRecord[];
   onMarkAsPaid: (billingId: string) => void;
   onViewDetails: (billing: BillingRecord) => void;
+  enablePrint?: boolean;
 }
 
 export default function BillingTable({ 
   billings, 
   filteredBillings, 
   onMarkAsPaid,
-  onViewDetails
+  onViewDetails,
+  enablePrint
 }: BillingTableProps) {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('th-TH', {
@@ -69,6 +70,81 @@ export default function BillingTable({
       year: 'numeric', 
       month: 'long' 
     });
+  };
+
+  const handlePrint = (billing: BillingRecord) => {
+    // เปิดหน้าต่างใหม่พร้อมรายละเอียดบิล สำหรับปริ้น
+    const details = `
+      <html>
+        <head>
+          <title>พิมพ์บิล - ${billing.rooms.room_number}</title>
+          <style>
+            body { font-family: sans-serif; padding: 16px; }
+            h2 { text-align: center; }
+            table { width: 100%; margin-top: 24px; border-collapse: collapse; }
+            td, th { border: 1px solid #777; padding: 8px; text-align: left; }
+            .total { font-weight: bold; color: #0d9488; }
+          </style>
+        </head>
+        <body>
+          <h2>ใบแจ้งค่าใช้จ่ายหอพัก</h2>
+          <table>
+            <tr>
+              <td>เดือน</td>
+              <td>${formatMonth(billing.billing_month)}</td>
+            </tr>
+            <tr>
+              <td>ชื่อผู้เช่า</td>
+              <td>${billing.tenants.first_name} ${billing.tenants.last_name}</td>
+            </tr>
+            <tr>
+              <td>ห้อง</td>
+              <td>${billing.rooms.room_number}</td>
+            </tr>
+            <tr>
+              <td>ค่าห้อง</td>
+              <td>${formatCurrency(billing.room_rent)}</td>
+            </tr>
+            <tr>
+              <td>ค่าน้ำ (${billing.water_units} คน)</td>
+              <td>${formatCurrency(billing.water_cost)}</td>
+            </tr>
+            <tr>
+              <td>ค่าไฟ (${billing.electricity_units} หน่วย)</td>
+              <td>${formatCurrency(billing.electricity_cost)}</td>
+            </tr>
+            <tr>
+              <td>รวมทั้งสิ้น</td>
+              <td class="total">${formatCurrency(billing.total_amount)}</td>
+            </tr>
+            <tr>
+              <td>ครบกำหนด</td>
+              <td>${formatDate(billing.due_date)}</td>
+            </tr>
+            <tr>
+              <td>สถานะ</td>
+              <td>${billing.status}</td>
+            </tr>
+            <tr>
+              <td>วันที่ชำระ</td>
+              <td>${billing.paid_date ? formatDate(billing.paid_date) : 'ยังไม่ได้ชำระ'}</td>
+            </tr>
+            <tr>
+              <td>วันที่สร้างบิล</td>
+              <td>${formatDate(billing.created_at)}</td>
+            </tr>
+          </table>
+          <hr style="margin:32px 0;" />
+          <div style="text-align:center;color:#888;font-size:12px;">ขอบคุณที่ใช้บริการหอพักของเรา</div>
+          <script>window.onload = () => { window.print(); setTimeout(()=>window.close(), 1000) }</script>
+        </body>
+      </html>
+    `;
+    const printWindow = window.open('', '_blank', 'width=720,height=900');
+    if (printWindow) {
+      printWindow.document.write(details);
+      printWindow.document.close();
+    }
   };
 
   return (
@@ -129,6 +205,15 @@ export default function BillingTable({
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="space-x-2">
+                        {enablePrint && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePrint(billing)}
+                          >
+                            ปริ้นบิล
+                          </Button>
+                        )}
                         {billing.status === 'pending' && (
                           <Button 
                             variant="outline" 

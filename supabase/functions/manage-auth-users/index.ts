@@ -4,13 +4,15 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.8";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Max-Age': '86400'
 };
 
-const handler = async (req: Request): Promise<Response> => {
-  // Handle CORS preflight requests
+serve(async (req: Request): Promise<Response> => {
+  // Explicitly handle preflight CORS requests for DELETE/POST with body
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { status: 204, headers: corsHeaders });
   }
 
   try {
@@ -52,7 +54,6 @@ const handler = async (req: Request): Promise<Response> => {
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    // How to branch by HTTP method
     if (req.method === 'GET') {
       // 1. RETURN up to 1000 users from auth list (no search or filter for demo)
       // Note: limit to 1000 for safety
@@ -61,8 +62,6 @@ const handler = async (req: Request): Promise<Response> => {
         return new Response(JSON.stringify({ error: error.message }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       }
-
-      // Return list of users (id, email, created_at)
       return new Response(JSON.stringify({
         users: data.users.map(u => ({
           id: u.id,
@@ -76,8 +75,16 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     if (req.method === 'DELETE') {
-      // body: { user_ids: [id1, id2, ...] }
-      const { user_ids } = await req.json();
+      let jsonBody: any;
+      try {
+        jsonBody = await req.json();
+      } catch (e) {
+        return new Response(JSON.stringify({ error: 'Malformed JSON body' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      const { user_ids } = jsonBody;
       if (!Array.isArray(user_ids) || user_ids.length === 0) {
         return new Response(JSON.stringify({ error: 'Missing user_ids' }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
@@ -98,17 +105,16 @@ const handler = async (req: Request): Promise<Response> => {
         failed,
       }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
-    // Not allowed
+
     return new Response(
       JSON.stringify({ error: 'Not allowed' }),
       { status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error: any) {
+    console.error('Edge Function Error:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
-};
-
-serve(handler);
+});

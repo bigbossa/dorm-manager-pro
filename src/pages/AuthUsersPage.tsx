@@ -66,6 +66,19 @@ export default function AuthUsersPage() {
 
   const handleDelete = async () => {
     if (!selected.length) return;
+
+    // ไม่ให้ลบ user ตัวเอง (admin)
+    if (selected.includes(user?.id)) {
+      toast({
+        title: language === "th" ? "ข้อผิดพลาด" : "Error",
+        description: language === "th"
+          ? "ไม่สามารถลบบัญชีผู้ดูแลระบบของคุณเองได้"
+          : "You cannot delete your own admin account.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setDeleting(true);
     try {
       const resp = await fetch(
@@ -80,11 +93,28 @@ export default function AuthUsersPage() {
           body: JSON.stringify({ user_ids: selected }),
         }
       );
-      const data = await resp.json();
-      if (resp.ok && data?.success) {
+      // เพิ่ม log
+      console.log("Edge Function Delete status:", resp.status);
+      let data = {};
+      try {
+        data = await resp.json();
+      } catch (e) {
+        // หาก response ไม่มี body
+        data = { error: "No response body" };
+      }
+      if (!resp.ok) {
+        toast({
+          title: "Error",
+          description: data && typeof data === "object" ? (data as any)?.error || "Failed to delete users" : "Failed to delete users",
+          variant: "destructive",
+        });
+        setDeleting(false);
+        return;
+      }
+      if ((data as any)?.success) {
         toast({
           title: language === "th" ? "ลบผู้ใช้เรียบร้อย" : "Users deleted",
-          description: `${data.deleted.length} deleted, ${data.failed.length} failed`,
+          description: `${(data as any).deleted.length} deleted, ${(data as any).failed.length} failed`,
           variant: "default",
         });
         setSelected([]);
@@ -92,12 +122,18 @@ export default function AuthUsersPage() {
       } else {
         toast({
           title: "Error",
-          description: data?.error || "Failed to delete users",
+          description: (data as any)?.error || "Failed to delete users",
           variant: "destructive",
         });
       }
     } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      // เพิ่ม log
+      console.log("Error in handleDelete:", err);
+      toast({ 
+        title: "Network Error",
+        description: err?.message || "Failed to connect to backend.", 
+        variant: "destructive" 
+      });
     }
     setDeleting(false);
   };

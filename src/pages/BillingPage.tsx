@@ -1,3 +1,4 @@
+
 import BillingCalculationDialog from "@/components/billing/BillingCalculationDialog";
 import BillingHeader from "@/components/billing/components/BillingHeader";
 import BillingFilters from "@/components/billing/components/BillingFilters";
@@ -73,12 +74,16 @@ const BillingPage = () => {
 
   return (
     <div className="animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row md:items-center mb-2 gap-2 justify-between">
-        <BillingHeader onOpenCalculationDialog={() => setShowCalculationDialog(true)} />
-        <Button variant="outline" className="flex items-center gap-2" onClick={handleExport}>
-          <FileSpreadsheet size={16} />
-          ส่งออกเป็น CSV
-        </Button>
+      <div className="flex flex-col md:flex-row md:items-start mb-2 gap-2">
+        {/* รวมปุ่มทั้งสองให้อยู่ซ้ายบนแบบแนวตั้ง */}
+        <div className="flex flex-col gap-2">
+          <BillingHeader onOpenCalculationDialog={() => setShowCalculationDialog(true)} />
+          <Button variant="outline" className="flex items-center gap-2" onClick={handleExport}>
+            <FileSpreadsheet size={16} />
+            ส่งออกเป็น CSV
+          </Button>
+        </div>
+        {/* เดิม BillingFilters จะอยู่ขวา ถ้าอยากให้เต็มกว้างอาจย้ายมาต่อท้าย */}
       </div>
 
       <BillingFilters

@@ -20,7 +20,7 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ closeSidebar }: SidebarProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { user } = useAuth();
   const location = useLocation();
 
@@ -70,6 +70,11 @@ export default function Sidebar({ closeSidebar }: SidebarProps) {
       href: "/settings",
       icon: Settings,
     },
++   {
++     name: language === "th" ? "จัดการ Auth Users" : "Auth Users",
++     href: "/auth-users",
++     icon: Users,
++   },
   ];
 
   const staffLinks = [

@@ -21,6 +21,7 @@ import NotFound from "./pages/NotFound";
 import Layout from "./components/Layout";
 import { useAuth } from "./providers/AuthProvider";
 import ProfilePage from "./pages/ProfilePage";
+import AuthUsersPage from "./pages/AuthUsersPage";
 
 const queryClient = new QueryClient();
 
@@ -147,6 +148,16 @@ const App = () => (
                     <Layout>
                       <ProtectedRoute>
                         <ProfilePage />
+                      </ProtectedRoute>
+                    </Layout>
+                  }
+                />
+                <Route
+                  path="/auth-users"
+                  element={
+                    <Layout>
+                      <ProtectedRoute>
+                        <AuthUsersPage />
                       </ProtectedRoute>
                     </Layout>
                   }

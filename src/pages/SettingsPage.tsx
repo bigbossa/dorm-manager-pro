@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/providers/AuthProvider";
 import { useLanguage } from "@/providers/LanguageProvider";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,11 +7,13 @@ import { UserManagementDialog } from "@/components/auth/UserManagementDialog";
 import { ProfileSettingsCard } from "@/components/settings/ProfileSettingsCard";
 import { SystemSettingsCard } from "@/components/settings/SystemSettingsCard";
 import { ThemeSettingsCard } from "@/components/settings/ThemeSettingsCard";
-import { Users, Shield } from "lucide-react";
+import { Users, Shield, KeyRound } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function SettingsPage() {
   const { user } = useAuth();
   const { language } = useLanguage();
+  const navigate = useNavigate();
 
   const getRoleText = (role: string) => {
     if (language === 'th') {
@@ -82,6 +83,14 @@ export default function SettingsPage() {
                   {language === 'th' ? 'เปิดการจัดการผู้ใช้' : 'Open User Management'}
                 </Button>
               </UserManagementDialog>
+              <Button
+                className="w-full mt-2"
+                variant="outline"
+                onClick={() => navigate("/auth-users")}
+              >
+                <Users className="mr-2 h-4 w-4" />
+                {language === "th" ? "ดู / ลบ Auth Users" : "View / Delete Auth Users"}
+              </Button>
             </CardContent>
           </Card>
         )}

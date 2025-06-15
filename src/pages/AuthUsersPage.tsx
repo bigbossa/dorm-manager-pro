@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useAuth } from "@/providers/AuthProvider";
 import { useLanguage } from "@/providers/LanguageProvider";
@@ -17,7 +16,7 @@ type AuthUser = {
 };
 
 export default function AuthUsersPage() {
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const { language } = useLanguage();
   const [users, setUsers] = useState<AuthUser[]>([]);
   const [loading, setLoading] = useState(false);
@@ -36,7 +35,7 @@ export default function AuthUsersPage() {
         `${import.meta.env.VITE_SUPABASE_EDGE_URL ?? `/functions/v1/manage-auth-users`}`,
         {
           headers: {
-            Authorization: `Bearer ${user?.access_token}`,
+            Authorization: `Bearer ${session?.access_token}`,
             apikey: import.meta.env.VITE_SUPABASE_ANON_KEY ?? "",
           },
         }
@@ -72,7 +71,7 @@ export default function AuthUsersPage() {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${user?.access_token}`,
+            Authorization: `Bearer ${session?.access_token}`,
             apikey: import.meta.env.VITE_SUPABASE_ANON_KEY ?? "",
           },
           body: JSON.stringify({ user_ids: selected }),

@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useAuth } from "@/providers/AuthProvider";
 import { useLanguage } from "@/providers/LanguageProvider";
@@ -14,6 +15,8 @@ type AuthUser = {
   banned_until?: string;
   confirmed_at?: string;
 };
+
+const EDGE_FUNCTION_URL = "https://mnsotnlftoumjwjlvzus.functions.supabase.co/manage-auth-users";
 
 export default function AuthUsersPage() {
   const { user, session } = useAuth();
@@ -32,11 +35,11 @@ export default function AuthUsersPage() {
     setLoading(true);
     try {
       const resp = await fetch(
-        `${import.meta.env.VITE_SUPABASE_EDGE_URL ?? `/functions/v1/manage-auth-users`}`,
+        EDGE_FUNCTION_URL,
         {
           headers: {
             Authorization: `Bearer ${session?.access_token}`,
-            apikey: import.meta.env.VITE_SUPABASE_ANON_KEY ?? "",
+            apikey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1uc290bmxmdG91bWp3amx2enVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgwMTI4NTYsImV4cCI6MjA2MzU4ODg1Nn0.8r2EP-08imfAL2EFVIgfCHu5lMs2ILJYGds8vs5LC98", // anon key
           },
         }
       );
@@ -66,13 +69,13 @@ export default function AuthUsersPage() {
     setDeleting(true);
     try {
       const resp = await fetch(
-        `${import.meta.env.VITE_SUPABASE_EDGE_URL ?? `/functions/v1/manage-auth-users`}`,
+        EDGE_FUNCTION_URL,
         {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${session?.access_token}`,
-            apikey: import.meta.env.VITE_SUPABASE_ANON_KEY ?? "",
+            apikey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1uc290bmxmdG91bWp3amx2enVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgwMTI4NTYsImV4cCI6MjA2MzU4ODg1Nn0.8r2EP-08imfAL2EFVIgfCHu5lMs2ILJYGds8vs5LC98",
           },
           body: JSON.stringify({ user_ids: selected }),
         }

@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Download, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 
 interface BillingHeaderProps {
   onOpenCalculationDialog: () => void;
@@ -14,12 +14,9 @@ export default function BillingHeader({ onOpenCalculationDialog }: BillingHeader
         <p className="text-muted-foreground">จัดการการคิดค่าใช้จ่ายของหอพัก</p>
       </div>
       <div className="mt-4 md:mt-0 space-x-2">
-        <Button variant="outline" className="flex items-center gap-2">
-          <Download size={16} />
-          ส่งออก
-        </Button>
+        {/* ลบปุ่ม 'ส่งออก' เก่าออก ให้เหลือแค่ปุ่มคำนวณค่าใช้จ่าย */}
         <Button 
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white"
           onClick={onOpenCalculationDialog}
         >
           <Plus size={16} />

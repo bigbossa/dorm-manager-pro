@@ -70,11 +70,11 @@ export default function Sidebar({ closeSidebar }: SidebarProps) {
       href: "/settings",
       icon: Settings,
     },
-+   {
-+     name: language === "th" ? "จัดการ Auth Users" : "Auth Users",
-+     href: "/auth-users",
-+     icon: Users,
-+   },
+    {
+      name: language === "th" ? "จัดการ Auth Users" : "Auth Users",
+      href: "/auth-users",
+      icon: Users,
+    },
   ];
 
   const staffLinks = [

@@ -1,26 +1,13 @@
-
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/providers/LanguageProvider";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { UserCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { StaffCreateDialog } from "@/components/staff/StaffCreateDialog";
 
 // ดึงข้อมูล staff จาก Supabase
 const fetchStaff = async () => {
@@ -41,12 +28,19 @@ const StaffPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
+  // เพิ่ม state สำหรับ dialog
+  const [openDialog, setOpenDialog] = useState(false);
+
+  const getStaff = async () => {
     setLoading(true);
-    fetchStaff().then((list) => {
-      setStaffList(list);
-      setLoading(false);
-    });
+    const list = await fetchStaff();
+    setStaffList(list);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    getStaff();
+    // eslint-disable-next-line
   }, []);
 
   const filteredStaff = staffList.filter(staff =>
@@ -58,13 +52,15 @@ const StaffPage = () => {
   
   return (
     <div className="animate-in fade-in duration-500">
+      <StaffCreateDialog open={openDialog} onOpenChange={setOpenDialog} onCreated={getStaff} />
+
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold">{t("Staff") || "Staff"}</h1>
           <p className="text-muted-foreground">{t("Manage your dormitory staff members") || "Manage your dormitory staff members"}</p>
         </div>
         <div className="mt-4 md:mt-0">
-          <Button className="flex items-center gap-2">
+          <Button className="flex items-center gap-2" onClick={() => setOpenDialog(true)}>
             <UserCircle size={16} />
             {t("Add New Staff") || "Add New Staff"}
           </Button>
